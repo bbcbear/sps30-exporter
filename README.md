@@ -1,6 +1,8 @@
 # sps30-exporter
 sps30 sensor prometheus exporter
 
+
+
 ## Usage
 ### Docker-Compose
 
@@ -28,3 +30,6 @@ scrape_configs:
     static_configs:
       - targets: ['sps30:2112']
 ```
+## Datasheet
+
+- [SPS30 Particulate Matter Sensor Datasheet (Sensirion)](https://www.sensirion.com/file/datasheet/sps30-datasheet.pdf)
