@@ -1,6 +1,6 @@
 # sps30-exporter
-sps30 sensor prometheus exporter
-
+sps30 sensor i2c prometheus exporter
+Tested only on RPi3 
 
 
 ## Usage
