@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  sps30-exporter:
+    build: .
+    container_name: sps30-exporter
+    restart: unless-stopped
+    ports:
+      - "2112:2112"
+    environment:
+      METRICS_ADDR: ":2112"
+      POLL_INTERVAL: "2s"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:2112/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    devices:
+      - "/dev/i2c-1:/dev/i2c-1"
+    privileged: true
