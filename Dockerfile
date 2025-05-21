@@ -9,13 +9,9 @@ COPY . .
 RUN go build -o /exporter ./cmd/exporter
 
 # ---------- Final image ----------
-FROM gcr.io/distroless/static:nonroot
+FROM gcr.io/distroless/static
 
 COPY --from=builder /exporter /exporter
-
-USER nonroot:nonroot
-
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:2112/healthz || exit 1
+USER root
 
 ENTRYPOINT ["/exporter"]
