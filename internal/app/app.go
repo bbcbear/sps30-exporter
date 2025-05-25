@@ -16,13 +16,12 @@ import (
 	"fmt"
 )
 
-var isSensorHealthy atomic.Bool
-
 type App struct {
 	Sensor   sensor.Sensor
 	Bus      interface{ Close() error }
 	Addr     string
 	Interval time.Duration
+	isSensorHealthy atomic.Bool
 }
 
 // I2CBusAdapter адаптирует *i2c.Dev к интерфейсу sensor.Bus
@@ -109,12 +108,12 @@ func (a *App) readAndUpdate() bool {
 	measuring, err := a.Sensor.IsMeasuring()
 	if err != nil {
 		metrics.IncReadError()
-		isSensorHealthy.Store(false)
+		a.isSensorHealthy.Store(false)
 		slog.Error("Sensor status check failed", "error", err)
 		return false
 	}
 	if !measuring {
-		isSensorHealthy.Store(false)
+		a.isSensorHealthy.Store(false)
 		slog.Warn("Sensor is not measuring, skipping update")
 		return false
 	}
@@ -122,12 +121,12 @@ func (a *App) readAndUpdate() bool {
 	data, err := a.Sensor.Read()
 	if err != nil {
 		metrics.IncReadError()
-		isSensorHealthy.Store(false)
+		a.isSensorHealthy.Store(false)
 		slog.Error("Failed to read sensor data", "error", err)
 		return false
 	}
 
-	isSensorHealthy.Store(true)
+	a.isSensorHealthy.Store(true)
 	metrics.Update(data)
 	slog.Info("Sensor data updated")
 	return true
@@ -153,7 +152,7 @@ func (a *App) recoverSensor() bool {
 }
 
 func (a *App) StartHTTPServer(ctx context.Context) error {
-	router := handlers.Init(a.Sensor, &isSensorHealthy)
+	router := handlers.Init(a.Sensor, a.isSensorHealthy)
 
 	srv := &http.Server{
 		Addr:    a.Addr,

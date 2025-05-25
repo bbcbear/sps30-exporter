@@ -11,7 +11,7 @@ import (
 	"bbcbear/sps30-exporter/internal/sensor"
 )
 
-func Init(sensorRef sensor.Sensor, isHealthy *atomic.Bool) http.Handler {
+func Init(sensorRef sensor.Sensor, isHealthy atomic.Bool) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.Handle("/metrics", promhttp.Handler())
